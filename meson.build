@@ -4,16 +4,19 @@ project(
 )
 
 gl_dep = dependency('gl')
+glm_dep = dependency('glm')
 glfw_dep = dependency('glfw3')
 
 executable (
   meson.project_name(),
   [
-    'src/main.cpp'
+    'src/main.cpp',
+    'src/shader.cpp',
   ],
   include_directories: include_directories('inc'),
   dependencies: [
     gl_dep,
+    glm_dep,
     glfw_dep,
   ]
 )
