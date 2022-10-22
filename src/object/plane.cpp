@@ -3,8 +3,9 @@
 #include <vector>
 
 namespace gl_learn {
-Plane::Plane(float x, float y, float z) {
-  this->pos = glm::vec3(x, y, z);
+Plane::Plane(glm::vec3 pos, glm::quat quat) {
+  this->pos  = pos;
+  this->quat = quat;
   this->init();
 };
 
@@ -26,5 +27,9 @@ void Plane::init() {
   });
 
   this->set_buffer_data();
+}
+
+void Plane::animate() {
+  this->quat *= glm::quat(glm::vec3(0.f, -0.05f, 0.f));
 }
 } // namespace gl_learn

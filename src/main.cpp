@@ -50,7 +50,7 @@ int main() {
   GLuint program_id = shader::compile_shader(vertex_shader, flagment_shader);
 
   gl_learn::Camera camera(3.f, 100.f, 0.01f);
-  gl_learn::Plane  plane(0.f, 1.f, 0.f);
+  gl_learn::Plane  plane({0.f, 0.f, 0.f}, glm::vec3(0.f, 30.f, 0.f));
   plane.init();
 
   while (!glfwWindowShouldClose(window)) {
@@ -65,7 +65,8 @@ int main() {
     glFlush();
     glfwSwapBuffers(window);
 
-    camera.animate();
+    plane.animate();
+    // camera.animate();
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

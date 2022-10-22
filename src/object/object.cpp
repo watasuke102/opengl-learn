@@ -33,9 +33,10 @@ void Object::render(GLuint program_id, const glm::mat4& vp_mat) {
   glUseProgram(program_id);
 
   GLuint    matrix_id = glGetUniformLocation(program_id, "mvp");
-  glm::mat4 model_mat = glm::translate(glm::mat4(1.f), this->pos);
+  glm::mat4 model_mat =
+      glm::translate(glm::mat4(1.f), this->pos) * glm::toMat4(this->quat);
   // std::cout << glm::to_string(model_mat) << "\r";
-  glm::mat4 mvp_mat   = vp_mat * model_mat;
+  glm::mat4 mvp_mat = vp_mat * model_mat;
   glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp_mat[0][0]);
 
   glEnableVertexAttribArray(0);
