@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLES3/gl3.h>
+
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 
@@ -21,4 +22,4 @@ class Camera {
   float     theta;
   float     far_clip, near_clip;
 };
-} // namespace gl_learn
+}  // namespace gl_learn

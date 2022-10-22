@@ -1,4 +1,5 @@
 #include "object/plane.hpp"
+
 #include <iostream>
 #include <vector>
 
@@ -12,10 +13,10 @@ Plane::Plane(glm::vec3 pos, glm::quat quat) {
 void Plane::init() {
   this->vertex.clear();
   this->vertex.assign({
-      {0.5f,  0.5f,  0.1f},
-      {0.5f,  -0.5f, 1.f },
-      {-0.5f, -0.5f, 1.f },
-      {-0.5f, 0.5f,  0.1f},
+      { 0.5f,  0.5f, 0.1f},
+      { 0.5f, -0.5f, 1.0f},
+      {-0.5f, -0.5f, 1.0f},
+      {-0.5f,  0.5f, 0.1f},
   });
 
   this->elements.clear();
@@ -32,4 +33,4 @@ void Plane::init() {
 void Plane::animate() {
   this->quat *= glm::quat(glm::vec3(0.f, -0.05f, 0.f));
 }
-} // namespace gl_learn
+}  // namespace gl_learn

@@ -1,4 +1,5 @@
 #include "shader.hpp"
+
 #include <iostream>
 #include <optional>
 
@@ -28,7 +29,7 @@ std::optional<GLuint> compile(GLuint program_id, int type, const char* src) {
   glDeleteShader(shader_id);
   return program_id;
 }
-} // namespace
+}  // namespace
 namespace shader {
 
 GLuint compile_shader(const char* vertex_src, const char* flagment_src) {
@@ -61,4 +62,4 @@ err:
   glDeleteProgram(program_id);
   return 0;
 }
-} // namespace shader
+}  // namespace shader

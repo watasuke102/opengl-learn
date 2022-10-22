@@ -1,9 +1,10 @@
 #pragma once
 
-#include "common.hpp"
-#include "object/object.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+#include "common.hpp"
+#include "object/object.hpp"
 
 namespace gl_learn {
 class Plane : public Object {
@@ -14,4 +15,4 @@ class Plane : public Object {
   void init() override;
   void animate() override;
 };
-} // namespace gl_learn
+}  // namespace gl_learn

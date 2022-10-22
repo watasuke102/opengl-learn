@@ -1,11 +1,12 @@
 #include "object/sphere.hpp"
+
 #include <iostream>
 #include <vector>
 
 namespace {
 constexpr GLfloat  SPHERE_RADIUS = 1.f;
 constexpr uint32_t SPHERE_DIV    = 32;
-} // namespace
+}  // namespace
 
 namespace gl_learn {
 Sphere::Sphere(glm::vec3 pos, glm::quat quat) {
@@ -46,7 +47,8 @@ void Sphere::init() {
   // vertical (bottom)
   for (GLuint i = 1; i <= SPHERE_DIV; ++i) {
     this->elements.push_back(
-        {SPHERE_DIV * SPHERE_DIV - i, SPHERE_DIV * SPHERE_DIV});
+        {SPHERE_DIV * SPHERE_DIV - i, SPHERE_DIV * SPHERE_DIV}
+    );
   }
 
   this->set_buffer_data();
@@ -55,4 +57,4 @@ void Sphere::init() {
 void Sphere::animate() {
   // this->quat *= glm::quat(glm::vec3(0.f, 0.05f, 0.f));
 }
-} // namespace gl_learn
+}  // namespace gl_learn

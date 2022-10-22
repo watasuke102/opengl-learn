@@ -1,5 +1,6 @@
 #include <GLES3/gl3.h>
 #include <GLFW/glfw3.h>
+
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <iostream>
@@ -37,7 +38,8 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow* window = glfwCreateWindow(
-      gl_learn::WIDTH, gl_learn::HEIGHT, "OpenGL Learn", nullptr, nullptr);
+      gl_learn::WIDTH, gl_learn::HEIGHT, "OpenGL Learn", nullptr, nullptr
+  );
   if (!window) {
     glfwTerminate();
     return 1;

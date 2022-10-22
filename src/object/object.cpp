@@ -1,4 +1,6 @@
 #include "object/object.hpp"
+
+#include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
@@ -15,17 +17,17 @@ Object::~Object() {
 
 void Object::set_buffer_data() {
   glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer);
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(Vertex) * this->vertex.size(),
-               this->vertex.data(),
-               GL_STATIC_DRAW);
+  glBufferData(
+      GL_ARRAY_BUFFER, sizeof(Vertex) * this->vertex.size(),
+      this->vertex.data(), GL_STATIC_DRAW
+  );
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elements_buffer);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(LineElement) * this->elements.size(),
-               this->elements.data(),
-               GL_STATIC_DRAW);
+  glBufferData(
+      GL_ELEMENT_ARRAY_BUFFER, sizeof(LineElement) * this->elements.size(),
+      this->elements.data(), GL_STATIC_DRAW
+  );
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -44,13 +46,12 @@ void Object::render(GLuint program_id, const glm::mat4& vp_mat) {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elements_buffer);
-  glDrawElements(GL_LINES,
-                 sizeof(LineElement) * this->elements.size(),
-                 GL_UNSIGNED_INT,
-                 0);
+  glDrawElements(
+      GL_LINES, sizeof(LineElement) * this->elements.size(), GL_UNSIGNED_INT, 0
+  );
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glDisableVertexAttribArray(0);
 }
-} // namespace gl_learn
+}  // namespace gl_learn
