@@ -1,7 +1,13 @@
 #include "object/plane.hpp"
+#include <iostream>
 #include <vector>
 
 namespace gl_learn {
+Plane::Plane(float x, float y, float z) {
+  this->pos = glm::vec3(x, y, z);
+  this->init();
+};
+
 void Plane::init() {
   this->vertex.clear();
   this->vertex.assign({

@@ -7,7 +7,7 @@ namespace gl_learn {
 class Plane : public Object {
  public:
   DISABLE_MOVE_AND_COPY(Plane)
-  Plane()  = default;
+  Plane(float x, float y, float z);
   ~Plane() = default;
   void init() override;
 };

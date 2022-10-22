@@ -12,8 +12,8 @@ class Object {
   DISABLE_MOVE_AND_COPY(Object)
   Object();
   virtual ~Object();
-  void         render(GLuint program_id, const glm::mat4& vp_mat);
   virtual void init() = 0;
+  void         render(GLuint program_id, const glm::mat4& vp_mat);
 
  protected:
   glm::vec3            pos;

@@ -8,7 +8,10 @@ Object::Object() {
   glGenBuffers(1, &this->vertex_buffer);
   glGenBuffers(1, &this->elements_buffer);
 }
-Object::~Object() {}
+Object::~Object() {
+  glDeleteBuffers(1, &this->vertex_buffer);
+  glDeleteBuffers(1, &this->elements_buffer);
+}
 
 void Object::set_buffer_data() {
   glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer);

@@ -50,7 +50,7 @@ int main() {
   GLuint program_id = shader::compile_shader(vertex_shader, flagment_shader);
 
   gl_learn::Camera camera(3.f, 100.f, 0.01f);
-  gl_learn::Plane  plane;
+  gl_learn::Plane  plane(0.f, 1.f, 0.f);
   plane.init();
 
   while (!glfwWindowShouldClose(window)) {
