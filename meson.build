@@ -10,6 +10,7 @@ glfw_dep = dependency('glfw3')
 executable (
   meson.project_name(),
   [
+    'src/camera.cpp',
     'src/main.cpp',
     'src/shader.cpp',
   ],

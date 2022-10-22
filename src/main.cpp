@@ -4,18 +4,18 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
+#include "camera.hpp"
 #include "shader.hpp"
 
 #define GLSL(s) (const char*)"#version 310 es\n" #s
 
-constexpr uint32_t WIDTH  = 800;
-constexpr uint32_t HEIGHT = 600;
-
 const char* vertex_shader = GLSL(
 
-    layout(location = 0) in vec2 position;
+    uniform mat4 mvp;
 
-    void main() { gl_Position = vec4(position, 0.0, 1.0); }
+    layout(location = 0) in vec3 position;
+
+    void main() { gl_Position = mvp * vec4(position, 1.0); }
 
 );
 const char* flagment_shader = GLSL(
@@ -25,7 +25,7 @@ const char* flagment_shader = GLSL(
 );
 
 struct Pos {
-  GLfloat x, y;
+  GLfloat x, y, z;
 };
 
 struct Edge {
@@ -44,8 +44,8 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow* window =
-      glfwCreateWindow(WIDTH, HEIGHT, "OpenGL Learn", nullptr, nullptr);
+  GLFWwindow* window = glfwCreateWindow(
+      gl_learn::WIDTH, gl_learn::HEIGHT, "OpenGL Learn", nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     return 1;
@@ -69,12 +69,16 @@ int main() {
         (Pos*)glMapBufferRange(GL_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
     pos[0].x = 0.5f;
     pos[0].y = 0.5f;
+    pos[0].z = 0.1f;
     pos[1].x = 0.5f;
     pos[1].y = -0.5f;
+    pos[1].z = 1.f;
     pos[2].x = -0.5f;
     pos[2].y = -0.5f;
+    pos[2].z = 1.f;
     pos[3].x = -0.5f;
     pos[3].y = 0.5f;
+    pos[3].z = 0.1f;
     // needless?
     glUnmapBuffer(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -98,18 +102,27 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
 
+  gl_learn::Camera camera(3.f, 100.f, 0.01f);
+  GLuint           matrix_id = glGetUniformLocation(program_id, "mvp");
+  glm::mat4        vp_mat, mvp_mat;
+
   while (!glfwWindowShouldClose(window)) {
-    glViewport(0, 0, WIDTH, HEIGHT);
+    glViewport(0, 0, gl_learn::WIDTH, gl_learn::HEIGHT);
     glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(program_id);
 
+    camera.view_projection_mat(vp_mat);
+    // mvp = vp * model
+    mvp_mat = vp_mat * glm::mat4(1.f);
+    glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp_mat[0][0]);
+
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
-    glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINES, 12, GL_UNSIGNED_INT, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -118,6 +131,8 @@ int main() {
 
     glfwSwapBuffers(window);
     glfwPollEvents();
+
+    camera.animate();
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
       glfwSetWindowShouldClose(window, true);
