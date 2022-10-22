@@ -14,6 +14,7 @@
 namespace gl_learn {
 using Vertex      = std::array<GLfloat, 3>;
 using LineElement = std::array<GLuint, 2>;
+using UV          = std::array<GLuint, 2>;
 
 constexpr std::uint32_t WIDTH  = 800;
 constexpr std::uint32_t HEIGHT = 600;

@@ -6,25 +6,52 @@
 #include <iostream>
 
 #include "camera.hpp"
+#include "object/plane.hpp"
 #include "object/sphere.hpp"
 #include "shader.hpp"
 
 #define GLSL(s) (const char*)"#version 310 es\n" #s
 
+// clang-format off
 const char* vertex_shader = GLSL(
+  layout(location = 0) in vec3 position;
 
-    uniform mat4 mvp;
+  uniform mat4 mvp;
 
-    layout(location = 0) in vec3 position;
-
-    void main() { gl_Position = mvp * vec4(position, 1.0); }
-
+  void main() {
+    gl_Position = mvp * vec4(position, 1.0);
+  }
 );
 const char* flagment_shader = GLSL(
+  out mediump vec4 color;
 
-    out mediump vec4 color; void main() { color = vec4(1.0, 0.0, 0.0, 1.0); }
-
+  void main() {
+    color = vec4(1.0, 0.0, 0.0, 1.0);
+  }
 );
+
+const char* texture_vertex_shader = GLSL(
+  layout(location = 0) in vec3 position;
+  layout(location = 1) in vec2 vertex_uv;
+
+  uniform mat4 mvp;
+  out vec2 uv;
+
+  void main() {
+    gl_Position = mvp * vec4(position, 1.0);
+    uv = vertex_uv;
+  }
+);
+const char* texture_flagment_shader = GLSL(
+  uniform sampler2D texture;
+  in  mediump vec2 uv;
+  out mediump vec4 color;
+
+  void main() {
+    color = texture2D(texture, uv);
+  }
+);
+// clang-format on
 
 int main() {
   if (!glfwInit()) {
@@ -49,10 +76,14 @@ int main() {
   glfwMakeContextCurrent(window);
   std::cout << "context created" << std::endl;
 
-  GLuint program_id = shader::compile_shader(vertex_shader, flagment_shader);
+  GLuint normal_program =
+      shader::compile_shader(vertex_shader, flagment_shader);
+  GLuint texture_program =
+      shader::compile_shader(texture_vertex_shader, texture_flagment_shader);
 
   gl_learn::Camera camera(3.f, 100.f, 0.01f);
-  gl_learn::Sphere sphere({0.4f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 10.f));
+  // gl_learn::Sphere sphere({0.4f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 10.f));
+  gl_learn::Plane  plane({0.f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 0.f));
 
   std::cout << "loop start" << std::endl;
   while (!glfwWindowShouldClose(window)) {
@@ -63,7 +94,7 @@ int main() {
     glm::mat4 vp_mat;
     camera.view_projection_mat(vp_mat);
 
-    sphere.render(program_id, vp_mat);
+    plane.render(normal_program, texture_program, vp_mat);
     glFlush();
     glfwSwapBuffers(window);
 

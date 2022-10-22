@@ -22,11 +22,19 @@ void Plane::init() {
   this->elements.clear();
   this->elements.assign({
       {0, 1},
-      {1, 2},
-      {2, 3},
+      {2, 2},
       {3, 0},
   });
 
+  this->uv.clear();
+  this->uv.assign({
+      {1, 0},
+      {1, 1},
+      {0, 1},
+      {0, 0},
+  });
+
+  this->load_texture("assets/icon.raw", 512, 512);
   this->set_buffer_data();
 }
 
