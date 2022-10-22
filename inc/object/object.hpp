@@ -18,11 +18,11 @@ class Object {
   virtual void animate() = 0;
 
  protected:
-  glm::vec3            pos;
-  glm::quat            quat;
-  std::vector<Vertex>  vertex;
-  std::vector<Element> elements;
-  void                 set_buffer_data();
+  glm::vec3                pos;
+  glm::quat                quat;
+  std::vector<Vertex>      vertex;
+  std::vector<LineElement> elements;
+  void                     set_buffer_data();
 
  private:
   GLuint vertex_buffer;
