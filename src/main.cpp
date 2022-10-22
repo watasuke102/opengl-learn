@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "camera.hpp"
-#include "plane.hpp"
+#include "object/plane.hpp"
 #include "shader.hpp"
 
 #define GLSL(s) (const char*)"#version 310 es\n" #s
@@ -51,6 +51,7 @@ int main() {
 
   gl_learn::Camera camera(3.f, 100.f, 0.01f);
   gl_learn::Plane  plane;
+  plane.init();
 
   while (!glfwWindowShouldClose(window)) {
     glViewport(0, 0, gl_learn::WIDTH, gl_learn::HEIGHT);

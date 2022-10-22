@@ -3,7 +3,7 @@
 all: b r
 
 b:
-	ninja -C build
+	clear && ninja -C build
 
 r:
 	./build/opengl-learn
