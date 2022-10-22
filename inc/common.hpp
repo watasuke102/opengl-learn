@@ -1,5 +1,9 @@
 #pragma once
 
+#include <GLES3/gl3.h>
+#include <array>
+#include <cstdint>
+
 #define DISABLE_MOVE_AND_COPY(Class)                                           \
   Class(const Class&)            = delete;                                     \
   Class(Class&&)                 = delete;                                     \
@@ -7,6 +11,9 @@
   Class& operator=(Class&&)      = delete;
 
 namespace gl_learn {
-constexpr uint32_t WIDTH  = 800;
-constexpr uint32_t HEIGHT = 600;
+using Vertex  = std::array<GLfloat, 3>;
+using Element = std::array<GLuint, 2>;
+
+constexpr std::uint32_t WIDTH  = 800;
+constexpr std::uint32_t HEIGHT = 600;
 } // namespace gl_learn

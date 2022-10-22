@@ -1,8 +1,8 @@
 #pragma once
 
 #include <GLES3/gl3.h>
+#include <glm/ext.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 #include "common.hpp"
 

@@ -12,6 +12,7 @@ executable (
   [
     'src/camera.cpp',
     'src/main.cpp',
+    'src/plane.cpp',
     'src/shader.cpp',
   ],
   include_directories: include_directories('inc'),
