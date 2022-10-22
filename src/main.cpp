@@ -82,8 +82,7 @@ int main() {
       shader::compile_shader(texture_vertex_shader, texture_flagment_shader);
 
   gl_learn::Camera camera(3.f, 100.f, 0.01f);
-  // gl_learn::Sphere sphere({0.4f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 10.f));
-  gl_learn::Plane  plane({0.f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 0.f));
+  gl_learn::Plane  plane({-0.5f, 0.f, 0.5f}, glm::vec3(0.f, 0.f, 0.f));
 
   std::cout << "loop start" << std::endl;
   while (!glfwWindowShouldClose(window)) {
@@ -99,7 +98,8 @@ int main() {
     glfwSwapBuffers(window);
 
     // sphere.animate();
-    camera.animate();
+    plane.animate();
+    // camera.animate();
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

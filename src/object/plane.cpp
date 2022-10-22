@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace gl_learn {
-Plane::Plane(glm::vec3 pos, glm::quat quat) {
+Plane::Plane(glm::vec3 pos, glm::quat quat) : Object(GL_TRIANGLES) {
   this->pos  = pos;
   this->quat = quat;
   this->init();
@@ -21,9 +21,8 @@ void Plane::init() {
 
   this->elements.clear();
   this->elements.assign({
-      {0, 1},
-      {2, 2},
-      {3, 0},
+      0, 1, 2,  //
+      2, 3, 0,  //
   });
 
   this->uv.clear();
@@ -39,6 +38,6 @@ void Plane::init() {
 }
 
 void Plane::animate() {
-  this->quat *= glm::quat(glm::vec3(0.f, -0.05f, 0.f));
+  this->quat *= glm::quat(glm::vec3(-0.03f, 0.f, 0.f));
 }
 }  // namespace gl_learn

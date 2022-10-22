@@ -14,7 +14,7 @@ namespace gl_learn {
 class Object {
  public:
   DISABLE_MOVE_AND_COPY(Object)
-  Object();
+  Object(GLenum mode);
   virtual ~Object();
   virtual void init()    = 0;
   virtual void animate() = 0;
@@ -25,12 +25,13 @@ class Object {
   void load_texture(std::string file_name, GLsizei width, GLsizei height);
 
  protected:
-  glm::vec3                pos;
-  glm::quat                quat;
-  std::vector<Vertex>      vertex;
-  std::vector<LineElement> elements;
-  std::vector<UV>          uv;
-  void                     set_buffer_data();
+  glm::vec3           pos;
+  glm::quat           quat;
+  std::vector<Vertex> vertex;
+  std::vector<GLuint> elements;
+  std::vector<UV>     uv;
+  GLenum              render_mode;
+  void                set_buffer_data();
 
  private:
   GLuint vertex_buffer;

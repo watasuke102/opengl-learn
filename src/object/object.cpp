@@ -6,7 +6,7 @@
 #include <iostream>
 
 namespace gl_learn {
-Object::Object() : texture(0) {
+Object::Object(GLenum mode) : render_mode(mode), texture(0) {
   glGenBuffers(1, &this->vertex_buffer);
   glGenBuffers(1, &this->elements_buffer);
   glGenBuffers(1, &this->uv_buffer);
@@ -50,7 +50,7 @@ void Object::set_buffer_data() {
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elements_buffer);
   glBufferData(
-      GL_ELEMENT_ARRAY_BUFFER, sizeof(LineElement) * this->elements.size(),
+      GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * this->elements.size(),
       this->elements.data(), GL_STATIC_DRAW
   );
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -90,7 +90,7 @@ void Object::render(
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elements_buffer);
   glDrawElements(
-      GL_TRIANGLES, sizeof(LineElement) * this->elements.size(),
+      this->render_mode, sizeof(GLuint) * this->elements.size(),
       GL_UNSIGNED_INT, 0
   );
 

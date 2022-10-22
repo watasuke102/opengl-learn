@@ -9,7 +9,7 @@ constexpr uint32_t SPHERE_DIV    = 32;
 }  // namespace
 
 namespace gl_learn {
-Sphere::Sphere(glm::vec3 pos, glm::quat quat) {
+Sphere::Sphere(glm::vec3 pos, glm::quat quat) : Object(GL_LINES) {
   this->pos  = pos;
   this->quat = quat;
   this->init();
@@ -32,29 +32,31 @@ void Sphere::init() {
       if (i != 0 && i != SPHERE_DIV) {
         const GLuint index_y = i * SPHERE_DIV + j;
         if (j == SPHERE_DIV - 1) {
-          this->elements.push_back({index_y, i * SPHERE_DIV});
+          this->elements.push_back(index_y);
+          this->elements.push_back(i * SPHERE_DIV);
         } else {
-          this->elements.push_back({index_y, index_y + 1});
+          this->elements.push_back(index_y);
+          this->elements.push_back(index_y + 1);
         }
       }
       // vertical line
       if (i != 0 && j != 0) {
         const GLuint index_xz = SPHERE_DIV * j - i;
-        this->elements.push_back({index_xz, index_xz + SPHERE_DIV});
+        this->elements.push_back(index_xz);
+        this->elements.push_back(index_xz + SPHERE_DIV);
       }
     }
   }
   // vertical (bottom)
   for (GLuint i = 1; i <= SPHERE_DIV; ++i) {
-    this->elements.push_back(
-        {SPHERE_DIV * SPHERE_DIV - i, SPHERE_DIV * SPHERE_DIV}
-    );
+    this->elements.push_back(SPHERE_DIV * SPHERE_DIV - i);
+    this->elements.push_back(SPHERE_DIV * SPHERE_DIV);
   }
 
   this->set_buffer_data();
 }
 
 void Sphere::animate() {
-  // this->quat *= glm::quat(glm::vec3(0.f, 0.05f, 0.f));
+  this->quat *= glm::quat(glm::vec3(0.f, 0.006f, 0.f));
 }
 }  // namespace gl_learn
