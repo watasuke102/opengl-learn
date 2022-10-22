@@ -19,7 +19,7 @@ void Camera::view_projection_mat(glm::mat4& mat) {
 void Camera::animate() {
   this->pos.x = this->r * cosf(this->theta);
   this->pos.z = this->r * sinf(this->theta);
-  this->theta += glm::pi<float>() / 60;
+  this->theta += glm::pi<float>() / 256;
   // std::cout << this->pos.x << ", " << this->pos.z << std::endl;
 }
 } // namespace gl_learn

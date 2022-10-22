@@ -13,8 +13,10 @@ executable (
     'src/camera.cpp',
     'src/main.cpp',
     'src/shader.cpp',
+    
     'src/object/object.cpp',
     'src/object/plane.cpp',
+    'src/object/sphere.cpp',
   ],
   include_directories: include_directories('inc'),
   dependencies: [
