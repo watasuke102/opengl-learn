@@ -65,6 +65,6 @@ void FrameSphere::init() {
 }
 
 void FrameSphere::animate() {
-  this->quat *= glm::quat(glm::vec3(0.00f, 0.01f, 0.f));
+  this->quat *= glm::quat(glm::vec3(0.01f, 0.01f, 0.f));
 }
 }  // namespace gl_learn

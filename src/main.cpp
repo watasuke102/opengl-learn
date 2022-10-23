@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "camera.hpp"
+#include "object/frame_sphere.hpp"
 #include "object/plane.hpp"
 #include "object/sphere.hpp"
 #include "shader.hpp"
@@ -84,9 +85,11 @@ int main() {
   GLuint texture_program =
       shader::compile_shader(texture_vertex_shader, texture_flagment_shader);
 
-  gl_learn::Camera camera(3.f, 100.f, 0.01f);
-  // gl_learn::Plane  plane({-0.5f, 0.f, 0.5f}, glm::vec3(0.f, 0.f, 0.f));
-  gl_learn::Sphere sphere({0.f, 0.f, 0.9f}, glm::vec3(0.f, 0.f, 0.f));
+  gl_learn::Camera      camera(3.f, 100.f, 0.01f);
+  gl_learn::Sphere      sphere({-0.3f, 0.f, 0.f}, glm::vec3(0.f, 0.f, -37.f));
+  gl_learn::FrameSphere frame_sphere(
+      {0.3f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 0.f)
+  );
 
   std::cout << "loop start" << std::endl;
   while (!glfwWindowShouldClose(window)) {
@@ -97,12 +100,13 @@ int main() {
     glm::mat4 vp_mat;
     camera.view_projection_mat(vp_mat);
 
+    frame_sphere.render(normal_program, texture_program, vp_mat);
     sphere.render(normal_program, texture_program, vp_mat);
     glFlush();
     glfwSwapBuffers(window);
 
     sphere.animate();
-    // plane.animate();
+    frame_sphere.animate();
     // camera.animate();
     glfwPollEvents();
 

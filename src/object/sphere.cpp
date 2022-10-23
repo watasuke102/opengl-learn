@@ -67,6 +67,6 @@ void Sphere::init() {
 }
 
 void Sphere::animate() {
-  this->quat *= glm::quat(glm::vec3(0.010f, 0.01f, 0.f));
+  this->quat *= glm::quat(glm::vec3(0.f, -0.01f, 0.f));
 }
 }  // namespace gl_learn
