@@ -6,8 +6,8 @@
 #include <iostream>
 
 #include "camera.hpp"
+#include "object/frame_sphere.hpp"
 #include "object/plane.hpp"
-#include "object/sphere.hpp"
 #include "shader.hpp"
 
 #define GLSL(s) (const char*)"#version 310 es\n" #s
@@ -81,9 +81,9 @@ int main() {
   GLuint texture_program =
       shader::compile_shader(texture_vertex_shader, texture_flagment_shader);
 
-  gl_learn::Camera camera(3.f, 100.f, 0.01f);
+  gl_learn::Camera      camera(3.f, 100.f, 0.01f);
   // gl_learn::Plane  plane({-0.5f, 0.f, 0.5f}, glm::vec3(0.f, 0.f, 0.f));
-  gl_learn::Sphere sphere({0.4f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 10.f));
+  gl_learn::FrameSphere sphere({0.4f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 10.f));
 
   std::cout << "loop start" << std::endl;
   while (!glfwWindowShouldClose(window)) {

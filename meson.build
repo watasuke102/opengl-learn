@@ -14,6 +14,7 @@ executable (
     'src/main.cpp',
     'src/shader.cpp',
     
+    'src/object/frame_sphere.cpp',
     'src/object/object.cpp',
     'src/object/plane.cpp',
     'src/object/sphere.cpp',
