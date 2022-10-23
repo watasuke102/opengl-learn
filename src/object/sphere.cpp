@@ -22,7 +22,7 @@ void Sphere::init() {
 
   constexpr auto div_theta = glm::pi<float>() / SPHERE_DIV;
   for (auto i = 0u; i <= SPHERE_DIV; ++i) {
-    const float y = cosf(div_theta * i);
+    const float y = SPHERE_RADIUS * cosf(div_theta * i);
     const float r = SPHERE_RADIUS * sinf(acosf(y / SPHERE_RADIUS));
     for (auto j = 0u; j < SPHERE_DIV; ++j) {
       if ((i != 0 && i != SPHERE_DIV) || j == 0) {
