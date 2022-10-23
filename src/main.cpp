@@ -54,7 +54,7 @@ const char* texture_vertex_shader = GLSL(
     const mediump vec3 L_amb    = vec3(0.0);
     const mediump vec3 L_diff   = vec3(1.0);
     const mediump vec3 L_spec   = vec3(1.0);
-    const mediump vec3 L_pos    = vec3(0.2, 0.2, 2.0);
+    const mediump vec3 L_pos    = vec3(0.0, 0.0, 2.0);
 
     // vector
     mediump vec3 V = normalize(-gl_Position.xyz);

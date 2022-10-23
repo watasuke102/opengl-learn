@@ -6,7 +6,7 @@
 
 namespace {
 constexpr GLfloat  SPHERE_RADIUS = 1.f;
-constexpr uint32_t SPHERE_DIV    = 64;
+constexpr uint32_t SPHERE_DIV    = 32;
 }  // namespace
 
 namespace gl_learn {
@@ -64,7 +64,7 @@ void Sphere::init() {
   }
 
   for (std::uint32_t i = 0; i < (std::uint32_t)this->vertex.size(); ++i) {
-    glm::vec3 normal(0.f);
+    glm::vec3 normal_vec(0.f);
     for (auto e : faces) {
       if (e[0] == i || e[1] == i || e[2] == 0) {
         const auto vert0 = glm::vec3(
@@ -78,10 +78,11 @@ void Sphere::init() {
         );
         const auto edge0 = vert1 - vert0;
         const auto edge1 = vert2 - vert0;
-        normal += glm::normalize(edge0 * edge1);
+        normal_vec += glm::normalize(glm::cross(edge0, edge1));
       }
     }
-    this->normal.push_back({normal.x, normal.y, normal.z});
+    normal_vec = glm::normalize(normal_vec);
+    this->normal.push_back({normal_vec.x, normal_vec.y, normal_vec.z});
   }
 
   this->load_texture("assets/earth_1024x512.raw", 1024, 512);
