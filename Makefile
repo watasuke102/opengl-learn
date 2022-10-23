@@ -6,4 +6,4 @@ b:
 	clear && ninja -C build
 
 r:
-	./build/opengl-learn
+	gdb -q --batch -ex "run" -ex "bt" --args ./build/opengl-learn

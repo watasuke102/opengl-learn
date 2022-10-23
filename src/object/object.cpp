@@ -80,7 +80,7 @@ void Object::render(
   if (this->texture) {
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, this->uv_buffer);
-    glVertexAttribPointer(1, 2, GL_UNSIGNED_INT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glBindTexture(GL_TEXTURE_2D, this->texture);
   }
 

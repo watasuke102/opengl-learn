@@ -6,8 +6,8 @@
 #include <iostream>
 
 #include "camera.hpp"
-#include "object/frame_sphere.hpp"
 #include "object/plane.hpp"
+#include "object/sphere.hpp"
 #include "shader.hpp"
 
 #define GLSL(s) (const char*)"#version 310 es\n" #s
@@ -35,7 +35,7 @@ const char* texture_vertex_shader = GLSL(
   layout(location = 1) in vec2 vertex_uv;
 
   uniform mat4 mvp;
-  out vec2 uv;
+  out mediump vec2 uv;
 
   void main() {
     gl_Position = mvp * vec4(position, 1.0);
@@ -76,20 +76,23 @@ int main() {
   glfwMakeContextCurrent(window);
   std::cout << "context created" << std::endl;
 
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+
   GLuint normal_program =
       shader::compile_shader(vertex_shader, flagment_shader);
   GLuint texture_program =
       shader::compile_shader(texture_vertex_shader, texture_flagment_shader);
 
-  gl_learn::Camera      camera(3.f, 100.f, 0.01f);
+  gl_learn::Camera camera(3.f, 100.f, 0.01f);
   // gl_learn::Plane  plane({-0.5f, 0.f, 0.5f}, glm::vec3(0.f, 0.f, 0.f));
-  gl_learn::FrameSphere sphere({0.4f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 10.f));
+  gl_learn::Sphere sphere({0.f, 0.f, 0.9f}, glm::vec3(0.f, 0.f, 0.f));
 
   std::cout << "loop start" << std::endl;
   while (!glfwWindowShouldClose(window)) {
     glViewport(0, 0, gl_learn::WIDTH, gl_learn::HEIGHT);
     glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 vp_mat;
     camera.view_projection_mat(vp_mat);
@@ -98,9 +101,9 @@ int main() {
     glFlush();
     glfwSwapBuffers(window);
 
-    // sphere.animate();
+    sphere.animate();
     // plane.animate();
-    camera.animate();
+    // camera.animate();
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
