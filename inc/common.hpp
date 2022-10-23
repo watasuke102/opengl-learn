@@ -12,8 +12,9 @@
   Class& operator=(Class&&)      = delete;
 
 namespace gl_learn {
-using Vertex      = std::array<GLfloat, 3>;
-using UV          = std::array<GLfloat, 2>;
+using Vertex = std::array<GLfloat, 3>;
+using UV     = std::array<GLfloat, 2>;
+using Normal = std::array<GLfloat, 3>;
 
 constexpr std::uint32_t WIDTH  = 800;
 constexpr std::uint32_t HEIGHT = 600;

@@ -17,11 +17,9 @@ Sphere::Sphere(glm::vec3 pos, glm::quat quat) : Object(GL_TRIANGLES) {
 };
 
 void Sphere::init() {
-  this->vertex.clear();
-  this->elements.clear();
-
   std::array<std::vector<GLuint>, SPHERE_DIV - 1> points;
   constexpr auto div_theta = glm::pi<float>() / SPHERE_DIV;
+
   for (auto i = 0u; i <= SPHERE_DIV; ++i) {
     const float y = SPHERE_RADIUS * cosf(div_theta * i);
     const float r = SPHERE_RADIUS * sinf(acosf(y / SPHERE_RADIUS));
@@ -41,6 +39,8 @@ void Sphere::init() {
     }
   }
 
+  using Face = std::array<GLuint, 3>;
+  std::vector<Face> faces;
   for (auto i = 0; i < (int)SPHERE_DIV - 1; ++i) {
     for (auto j = 0; j < points[i].size(); ++j) {
       const GLuint begin = points[i][j];
@@ -58,8 +58,30 @@ void Sphere::init() {
         this->elements.push_back(begin);
         this->elements.push_back(end);
         this->elements.push_back(point);
+        faces.push_back({begin, end, point});
       }
     }
+  }
+
+  for (std::uint32_t i = 0; i < (std::uint32_t)this->vertex.size(); ++i) {
+    glm::vec3 normal(0.f);
+    for (auto e : faces) {
+      if (e[0] == i || e[1] == i || e[2] == 0) {
+        const auto vert0 = glm::vec3(
+            this->vertex[e[0]][0], this->vertex[e[0]][1], this->vertex[e[0]][2]
+        );
+        const auto vert1 = glm::vec3(
+            this->vertex[e[1]][0], this->vertex[e[1]][1], this->vertex[e[1]][2]
+        );
+        const auto vert2 = glm::vec3(
+            this->vertex[e[2]][0], this->vertex[e[2]][1], this->vertex[e[2]][2]
+        );
+        const auto edge0 = vert1 - vert0;
+        const auto edge1 = vert2 - vert0;
+        normal += glm::normalize(edge0 * edge1);
+      }
+    }
+    this->normal.push_back({normal.x, normal.y, normal.z});
   }
 
   this->load_texture("assets/earth_1024x512.raw", 1024, 512);

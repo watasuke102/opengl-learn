@@ -30,6 +30,7 @@ class Object {
   std::vector<Vertex> vertex;
   std::vector<GLuint> elements;
   std::vector<UV>     uv;
+  std::vector<Normal> normal;
   GLenum              render_mode;
   void                set_buffer_data();
 
@@ -37,6 +38,7 @@ class Object {
   GLuint vertex_buffer;
   GLuint elements_buffer;
   GLuint uv_buffer;
+  GLuint normal_buffer;
   GLuint texture;
 };
 }  // namespace gl_learn

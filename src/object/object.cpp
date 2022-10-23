@@ -10,11 +10,13 @@ Object::Object(GLenum mode) : render_mode(mode), texture(0) {
   glGenBuffers(1, &this->vertex_buffer);
   glGenBuffers(1, &this->elements_buffer);
   glGenBuffers(1, &this->uv_buffer);
+  glGenBuffers(1, &this->normal_buffer);
 }
 Object::~Object() {
   glDeleteBuffers(1, &this->vertex_buffer);
   glDeleteBuffers(1, &this->elements_buffer);
   glDeleteBuffers(1, &this->uv_buffer);
+  glDeleteBuffers(1, &this->normal_buffer);
 }
 
 void Object::load_texture(
@@ -61,6 +63,13 @@ void Object::set_buffer_data() {
       GL_STATIC_DRAW
   );
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, this->normal_buffer);
+  glBufferData(
+      GL_ARRAY_BUFFER, sizeof(Normal) * this->normal.size(),
+      this->normal.data(), GL_STATIC_DRAW
+  );
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Object::render(
@@ -76,6 +85,10 @@ void Object::render(
   // std::cout << glm::to_string(model_mat) << "\r";
   glm::mat4 mvp_mat = vp_mat * model_mat;
   glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp_mat[0][0]);
+
+  glEnableVertexAttribArray(2);
+  glBindBuffer(GL_ARRAY_BUFFER, this->normal_buffer);
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
   if (this->texture) {
     glEnableVertexAttribArray(1);
