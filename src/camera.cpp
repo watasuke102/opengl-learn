@@ -3,9 +3,9 @@
 #include <iostream>
 
 namespace gl_learn {
-Camera::Camera(float r, float far_clip, float near_clip)
-    : pos(0.f, 0.f, r)
-    , r(r)
+Camera::Camera(glm::vec3 pos, float far_clip, float near_clip)
+    : pos(pos)
+    , r(pos.z)
     , theta(-glm::pi<float>() / 2)
     , far_clip(far_clip)
     , near_clip(near_clip) {

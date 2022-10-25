@@ -11,7 +11,7 @@ namespace gl_learn {
 class Camera {
  public:
   DISABLE_MOVE_AND_COPY(Camera)
-  Camera(float r, float far_clip, float near_clip);
+  Camera(glm::vec3 pos, float far_clip, float near_clip);
 
   void view_projection_mat(glm::mat4& mat);
   void animate();
