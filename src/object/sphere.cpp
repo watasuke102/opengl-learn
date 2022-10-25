@@ -1,12 +1,13 @@
 #include "object/sphere.hpp"
 
+#include <glm/gtx/string_cast.hpp>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
 namespace {
 constexpr GLfloat  SPHERE_RADIUS = 1.f;
-constexpr uint32_t SPHERE_DIV    = 32;
+constexpr uint32_t SPHERE_DIV    = 64;
 }  // namespace
 
 namespace gl_learn {
@@ -32,6 +33,9 @@ void Sphere::init() {
             1 - sinf(div_theta * j / 2.2f),
             1 - cosf(div_theta * i / 2.f),
         });
+        // normal vec is same to vertex vec
+        auto v = glm::normalize(glm::vec3(x, y, z) * this->quat);
+        this->normal.push_back({v.x, v.y, v.z});
       }
       if (i != 0 && i != SPHERE_DIV) {
         points[i - 1].push_back(this->vertex.size() - 1);
@@ -63,33 +67,15 @@ void Sphere::init() {
     }
   }
 
-  for (std::uint32_t i = 0; i < (std::uint32_t)this->vertex.size(); ++i) {
-    glm::vec3 normal_vec(0.f);
-    for (auto e : faces) {
-      if (e[0] == i || e[1] == i || e[2] == 0) {
-        const auto vert0 = glm::vec3(
-            this->vertex[e[0]][0], this->vertex[e[0]][1], this->vertex[e[0]][2]
-        );
-        const auto vert1 = glm::vec3(
-            this->vertex[e[1]][0], this->vertex[e[1]][1], this->vertex[e[1]][2]
-        );
-        const auto vert2 = glm::vec3(
-            this->vertex[e[2]][0], this->vertex[e[2]][1], this->vertex[e[2]][2]
-        );
-        const auto edge0 = vert1 - vert0;
-        const auto edge1 = vert2 - vert0;
-        normal_vec += glm::normalize(glm::cross(edge0, edge1));
-      }
-    }
-    normal_vec = glm::normalize(normal_vec);
-    this->normal.push_back({normal_vec.x, normal_vec.y, normal_vec.z});
-  }
-
   this->load_texture("assets/earth_1024x512.raw", 1024, 512);
   this->set_buffer_data();
 }
 
 void Sphere::animate() {
-  this->quat *= glm::quat(glm::vec3(0.f, -0.01f, 0.f));
+  this->quat *= glm::quat(glm::vec3(0.f, -0.03f, 0.f));
+  this->normal.clear();
+  for (auto i : this->vertex) {
+    auto v = glm::normalize(glm::vec3(i[0], i[1], i[2]) * this->quat);
+  }
 }
 }  // namespace gl_learn
