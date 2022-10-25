@@ -16,11 +16,20 @@
 // clang-format off
 const char* vertex_shader = GLSL(
   layout(location = 0) in vec3 position;
+  layout(location = 1) in vec2 vertex_uv;
+  layout(location = 2) in vec3 vertex_normal;
 
   uniform mat4 mvp;
+  out mediump vec2 uv;
+  out mediump vec3 pos;
+  out mediump vec3 normal;
 
   void main() {
     gl_Position = mvp * vec4(position, 1.0);
+
+    uv     = vertex_uv;
+    pos    = gl_Position.xyz;
+    normal = vertex_normal;
   }
 );
 const char* flagment_shader = GLSL(
@@ -31,50 +40,37 @@ const char* flagment_shader = GLSL(
   }
 );
 
-const char* texture_vertex_shader = GLSL(
-  layout(location = 0) in vec3 position;
-  layout(location = 1) in vec2 vertex_uv;
-  layout(location = 2) in vec3 normal;
-
-  uniform mat4 mvp;
-  out mediump vec2 uv;
-  out mediump vec3 I;
+const char* texture_flagment_shader = GLSL(
+  uniform sampler2D texture;
+  in  mediump vec2 uv;
+  in  mediump vec3 pos;
+  in  mediump vec3 normal;
+  out mediump vec4 color;
 
   void main() {
-    gl_Position = mvp * vec4(position, 1.0);
-    uv = vertex_uv;
-
     // material constant
     const mediump vec3 K_amb    = vec3(0.5);
-    const mediump vec3 K_diff   = vec3(1.3);
-    const mediump vec3 K_spec   = vec3(0.2);
-    const mediump float K_shine = 180.0;
+    const mediump vec3 K_diff   = vec3(0.8);
+    const mediump vec3 K_spec   = vec3(0.8);
+    const mediump float K_shine = 80.0;
 
     // Light
     const mediump vec3 L_amb    = vec3(0.0);
     const mediump vec3 L_diff   = vec3(1.0);
     const mediump vec3 L_spec   = vec3(1.0);
-    const mediump vec3 L_pos    = vec3(0.0, 0.0, 2.0);
+    const mediump vec3 L_pos    = vec3(0.0, 0.0, 12.0);
 
     // vector
-    mediump vec3 V = normalize(-gl_Position.xyz);
+    mediump vec3 V = normalize(-pos.xyz);
     mediump vec3 N = normalize(normal);
-    mediump vec3 L = normalize(L_pos.xyz - gl_Position.xyz);
+    mediump vec3 L = normalize(L_pos.xyz - pos.xyz);
     mediump vec3 R = 2.0 * dot(N, L) * N - L;
 
     mediump vec3 I_amb  = K_amb  * L_amb;
     mediump vec3 I_diff = K_diff * L_diff * max(dot(N, L), 0.0);
-    mediump vec3 I_spec = K_spec * L_spec * pow(max(dot(reflect(-L, N), V), 0.0), K_shine);
-    I = I_amb + I_diff + I_spec;
-  }
-);
-const char* texture_flagment_shader = GLSL(
-  uniform sampler2D texture;
-  in  mediump vec2 uv;
-  in  mediump vec3 I;
-  out mediump vec4 color;
+    mediump vec3 I_spec = K_spec * L_spec * pow(max(dot(R, V), 0.0), K_shine);
+    mediump vec3 I      = I_amb + I_diff + I_spec;
 
-  void main() {
     color = texture2D(texture, uv) + vec4(I.x, I.y, I.z, 0.0);
   }
 );
@@ -109,7 +105,7 @@ int main() {
   GLuint normal_program =
       shader::compile_shader(vertex_shader, flagment_shader);
   GLuint texture_program =
-      shader::compile_shader(texture_vertex_shader, texture_flagment_shader);
+      shader::compile_shader(vertex_shader, texture_flagment_shader);
 
   gl_learn::Camera      camera(3.f, 100.f, 0.01f);
   gl_learn::Sphere      sphere({-0.3f, 0.f, 0.f}, glm::vec3(0.f, 0.f, -37.f));
@@ -131,9 +127,9 @@ int main() {
     glFlush();
     glfwSwapBuffers(window);
 
-    sphere.animate();
+    // sphere.animate();
     frame_sphere.animate();
-    // camera.animate();
+    camera.animate();
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {

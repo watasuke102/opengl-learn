@@ -6,4 +6,6 @@ b:
 	clear && ninja -C build
 
 r:
-	gdb -q --batch -ex "run" -ex "bt" --args ./build/opengl-learn
+	gdb -q --batch \
+		-ex "set print thread-events off" \
+		-ex "run" -ex "bt" --args ./build/opengl-learn
