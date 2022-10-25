@@ -34,7 +34,7 @@ void Sphere::init() {
             1 - cosf(div_theta * i / 2.f),
         });
         // normal vec is same to vertex vec
-        auto v = glm::normalize(glm::vec3(x, y, z) * this->quat);
+        auto v = glm::normalize(this->quat * glm::vec3(x, y, z));
         this->normal.push_back({v.x, v.y, v.z});
       }
       if (i != 0 && i != SPHERE_DIV) {
@@ -72,10 +72,12 @@ void Sphere::init() {
 }
 
 void Sphere::animate() {
-  this->quat *= glm::quat(glm::vec3(0.f, -0.03f, 0.f));
+  this->quat *= glm::quat(glm::vec3(0.f, -0.02f, 0.f));
   this->normal.clear();
   for (auto i : this->vertex) {
-    auto v = glm::normalize(glm::vec3(i[0], i[1], i[2]) * this->quat);
+    auto v = glm::normalize(this->quat * glm::vec3(i[0], i[1], i[2]));
+    this->normal.push_back({v.x, v.y, v.z});
   }
+  this->set_buffer_data();
 }
 }  // namespace gl_learn

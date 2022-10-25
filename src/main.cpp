@@ -49,16 +49,16 @@ const char* texture_flagment_shader = GLSL(
 
   void main() {
     // material constant
-    const mediump vec3 K_amb    = vec3(0.5);
-    const mediump vec3 K_diff   = vec3(0.8);
-    const mediump vec3 K_spec   = vec3(0.8);
+    const mediump vec3 K_amb    = vec3(0.6);
+    const mediump vec3 K_diff   = vec3(0.6);
+    const mediump vec3 K_spec   = vec3(0.4);
     const mediump float K_shine = 80.0;
 
     // Light
     const mediump vec3 L_amb    = vec3(0.0);
     const mediump vec3 L_diff   = vec3(1.0);
     const mediump vec3 L_spec   = vec3(1.0);
-    const mediump vec3 L_pos    = vec3(0.0, 0.0, 12.0);
+    const mediump vec3 L_pos    = vec3(-30.0, 20.0, 12.0);
 
     // vector
     mediump vec3 V = normalize(-pos.xyz);
@@ -107,11 +107,9 @@ int main() {
   GLuint texture_program =
       shader::compile_shader(vertex_shader, texture_flagment_shader);
 
-  gl_learn::Camera      camera(3.f, 100.f, 0.01f);
-  gl_learn::Sphere      sphere({-0.3f, 0.f, 0.f}, glm::vec3(0.f, 0.f, -37.f));
-  gl_learn::FrameSphere frame_sphere(
-      {0.3f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 0.f)
-  );
+  gl_learn::Camera      camera({0.f, 0.f, 2.5f}, 100.f, 0.01f);
+  gl_learn::Plane       plane({-3.f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 0.f));
+  gl_learn::Sphere      sphere({-0.f, 0.f, 0.f}, glm::vec3(0.f, 0.f, 0.f));
 
   std::cout << "loop start" << std::endl;
   while (!glfwWindowShouldClose(window)) {
@@ -122,14 +120,14 @@ int main() {
     glm::mat4 vp_mat;
     camera.view_projection_mat(vp_mat);
 
-    // frame_sphere.render(normal_program, texture_program, vp_mat);
+    plane.render(normal_program, texture_program, vp_mat);
     sphere.render(normal_program, texture_program, vp_mat);
     glFlush();
     glfwSwapBuffers(window);
 
-    // sphere.animate();
-    frame_sphere.animate();
-    camera.animate();
+    plane.animate();
+    sphere.animate();
+    // camera.animate();
     glfwPollEvents();
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
