@@ -4,5 +4,5 @@
 
 extern "C" {
 void init();
-void draw();
+int  draw();
 }

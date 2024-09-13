@@ -1,4 +1,5 @@
 #include "lib.hpp"
+#include <cstdint>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -71,30 +72,30 @@ err:
 
 const char* vertex_shader = GLSL(
 
-    layout(location = 0) in vec2 position;
+    layout(location = 0) in vec3 position;
 
-    out mediump vec2 pos;
+    out mediump vec3 pos;
 
     void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
-      pos         = gl_Position.xy;
+      gl_Position = vec4(position, 1.0);
+      pos         = gl_Position.xyz;
     }
 
 );
 const char* flagment_shader = GLSL(
 
-    in mediump vec2 pos; out mediump vec4 color;
+    in mediump vec3 pos; out mediump vec4 color;
 
     void main() {
-      mediump vec2 threshold = vec2(0);
-      mediump vec2 filtered  = step(threshold, pos);
-      color                  = vec4(filtered.x, filtered.y, 0.0, 1.0);
+      mediump vec3 threshold = vec3(0);
+      mediump vec3 filtered  = step(threshold, pos);
+      color                  = vec4(filtered, 1.0);
     }
 
 );
 
 struct Pos {
-  GLfloat x, y;
+  GLfloat x, y, z;
 };
 
 struct Edge {
@@ -120,14 +121,19 @@ void init() {
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
     Pos* pos =
         (Pos*)glMapBufferRange(GL_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
+    float z  = 1.f;
     pos[0].x = 0.5f;
     pos[0].y = 0.5f;
+    pos[0].z = z;
     pos[1].x = 0.5f;
     pos[1].y = -0.5f;
+    pos[1].z = z;
     pos[2].x = -0.5f;
     pos[2].y = -0.5f;
+    pos[2].z = z;
     pos[3].x = -0.5f;
     pos[3].y = 0.5f;
+    pos[3].z = z;
     // needless?
     glUnmapBuffer(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -150,14 +156,15 @@ void init() {
   }
 }
 
-void draw() {
+uint64_t i;
+int      draw() {
   glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   glUseProgram(program_id);
 
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
   glDrawElements(GL_TRIANGLE_FAN, 8, GL_UNSIGNED_INT, 0);
@@ -166,5 +173,6 @@ void draw() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glDisableVertexAttribArray(0);
   glFlush();
+  return i++;
 }
 }
