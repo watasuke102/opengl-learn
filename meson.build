@@ -7,18 +7,9 @@ gl_dep = dependency('gl')
 glm_dep = dependency('glm')
 glfw_dep = dependency('glfw3')
 
-lib = library('glesdraw', 'src/lib.cpp', include_directories: include_directories('inc'), dependencies: [gl_dep])
-
-executable (
-  meson.project_name(),
-  [
-    'src/main.cpp',
-  ],
+library(
+  'glesdraw',
+  'src/lib.cpp',
   include_directories: include_directories('inc'),
-  dependencies: [
-    gl_dep,
-    glm_dep,
-    glfw_dep,
-  ],
-  link_with: lib,
+  dependencies: [gl_dep]
 )
