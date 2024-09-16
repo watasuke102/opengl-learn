@@ -1,12 +1,15 @@
 #include "lib.hpp"
+#include <GLES3/gl3.h>
+#include <cstddef>
 #include <cstdint>
+// #include <glm/fwd.hpp>
 #include <iostream>
-#include <optional>
+// #include <optional>
 #include <string>
 #include <vector>
 
 namespace {
-std::optional<GLuint> compile(GLuint program_id, int type, const char* src) {
+int compile(GLuint program_id, int type, const char* src) {
   GLuint shader_id = glCreateShader(type);
 
   glShaderSource(shader_id, 1, &src, nullptr);
@@ -26,29 +29,27 @@ std::optional<GLuint> compile(GLuint program_id, int type, const char* src) {
 
     glDeleteShader(shader_id);
     glDeleteProgram(program_id);
-    return std::nullopt;
+    return -1;
   }
 
   glAttachShader(program_id, shader_id);
   glDeleteShader(shader_id);
   return program_id;
 }
-} // namespace
-namespace shader {
 
 GLuint compile_shader(const char* vertex_src, const char* flagment_src) {
-  GLuint                program_id   = glCreateProgram();
-  GLint                 link_success = GL_FALSE;
-  std::optional<GLuint> shader_id;
+  GLuint program_id   = glCreateProgram();
+  GLint  link_success = GL_FALSE;
+  int    shader_id;
 
   shader_id = compile(program_id, GL_VERTEX_SHADER, vertex_src);
-  if (!shader_id) {
+  if (shader_id == -1) {
     std::cout << "Failed to compile vertex shader" << std::endl;
     goto err;
   }
 
   shader_id = compile(program_id, GL_FRAGMENT_SHADER, flagment_src);
-  if (!shader_id) {
+  if (shader_id == -1) {
     std::cout << "Failed to compile flagment shader" << std::endl;
     goto err;
   }
@@ -66,7 +67,7 @@ err:
   glDeleteProgram(program_id);
   return 0;
 }
-} // namespace shader
+} // namespace
 
 #define GLSL(s) (const char*)"#version 310 es\n" #s
 
@@ -74,10 +75,10 @@ const char* vertex_shader = GLSL(
 
     layout(location = 0) in vec3 position;
 
-    out mediump vec3 pos;
+    uniform mat4 mvp; out mediump vec3 pos;
 
     void main() {
-      gl_Position = vec4(position, 1.0);
+      gl_Position = mvp * vec4(position, 1.0);
       pos         = gl_Position.xyz;
     }
 
@@ -105,23 +106,26 @@ struct Edge {
 
 namespace {
 GLuint program_id;
-GLuint pos_buffer, edge_buffer;
+GLuint vert_buffer, elem_buffer;
+
+constexpr size_t vert_len = 4;
+constexpr size_t elem_len = 3;
 } // namespace
 
 extern "C" {
 void init() {
-  program_id = shader::compile_shader(vertex_shader, flagment_shader);
+  program_id = compile_shader(vertex_shader, flagment_shader);
 
-  glGenBuffers(1, &pos_buffer);
-  glGenBuffers(1, &edge_buffer);
+  glGenBuffers(1, &vert_buffer);
+  glGenBuffers(1, &elem_buffer);
 
   {
-    GLsizeiptr size = sizeof(Pos) * 4;
-    glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
+    GLsizeiptr size = sizeof(Pos) * vert_len;
+    glBindBuffer(GL_ARRAY_BUFFER, vert_buffer);
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
     Pos* pos =
         (Pos*)glMapBufferRange(GL_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
-    float z  = 1.f;
+    float z  = 0.f;
     pos[0].x = 0.5f;
     pos[0].y = 0.5f;
     pos[0].z = z;
@@ -140,8 +144,8 @@ void init() {
   }
 
   {
-    GLsizeiptr size = sizeof(Edge) * 3;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
+    GLsizeiptr size = sizeof(Edge) * elem_len;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elem_buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
     Edge* edge = (Edge*)glMapBufferRange(
         GL_ELEMENT_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
@@ -157,17 +161,27 @@ void init() {
 }
 
 uint64_t i;
-int      draw() {
-  glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+int      draw(float x0, float y0, float z0, float w0, //
+              float x1, float y1, float z1, float w1, //
+              float x2, float y2, float z2, float w2, //
+              float x3, float y3, float z3, float w3  //
+     ) {
+  float mvp_mat[] = {
+      x0, y0, z0, w0, x1, y1, z1, w1, x2, y2, z2, w2, x3, y3, z3, w3};
+
+  // glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
+  // glClear(GL_COLOR_BUFFER_BIT);
   glUseProgram(program_id);
 
+  GLuint matrix_id = glGetUniformLocation(program_id, "mvp");
+  glUniformMatrix4fv(matrix_id, 1, GL_FALSE, mvp_mat);
+
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vert_buffer);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
-  glDrawElements(GL_TRIANGLE_FAN, 8, GL_UNSIGNED_INT, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elem_buffer);
+  glDrawElements(GL_TRIANGLE_FAN, elem_len * 2, GL_UNSIGNED_INT, 0);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
