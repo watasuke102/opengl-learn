@@ -1,10 +1,7 @@
-#include "lib.hpp"
 #include <GLES3/gl3.h>
 #include <cstddef>
 #include <cstdint>
-// #include <glm/fwd.hpp>
-#include <iostream>
-// #include <optional>
+// #include <iostream>
 #include <string>
 #include <vector>
 
@@ -23,9 +20,9 @@ int compile(GLuint program_id, int type, const char* src) {
 
     std::vector<char> log_message(log_length);
     glGetShaderInfoLog(shader_id, log_length, NULL, &log_message[0]);
-    std::cout << "[Shader error]" << std::endl
-              << std::string(log_message.begin(), log_message.end())
-              << std::endl;
+    // std::cout << "[Shader error]" << std::endl
+    //           << std::string(log_message.begin(), log_message.end())
+    //           << std::endl;
 
     glDeleteShader(shader_id);
     glDeleteProgram(program_id);
@@ -44,20 +41,20 @@ GLuint compile_shader(const char* vertex_src, const char* flagment_src) {
 
   shader_id = compile(program_id, GL_VERTEX_SHADER, vertex_src);
   if (shader_id == -1) {
-    std::cout << "Failed to compile vertex shader" << std::endl;
+    // std::cout << "Failed to compile vertex shader" << std::endl;
     goto err;
   }
 
   shader_id = compile(program_id, GL_FRAGMENT_SHADER, flagment_src);
   if (shader_id == -1) {
-    std::cout << "Failed to compile flagment shader" << std::endl;
+    // std::cout << "Failed to compile flagment shader" << std::endl;
     goto err;
   }
 
   glLinkProgram(program_id);
   glGetProgramiv(program_id, GL_LINK_STATUS, &link_success);
   if (!link_success) {
-    std::cout << "Failed to link shader" << std::endl;
+    // std::cout << "Failed to link shader" << std::endl;
     goto err;
   }
 
@@ -67,11 +64,10 @@ err:
   glDeleteProgram(program_id);
   return 0;
 }
-} // namespace
 
-#define GLSL(s) (const char*)"#version 310 es\n" #s
+#define GLSL(s) "#version 310 es\n" #s
 
-const char* vertex_shader = GLSL(
+constexpr char vertex_shader[] = GLSL(
 
     layout(location = 0) in vec3 position;
 
@@ -83,7 +79,7 @@ const char* vertex_shader = GLSL(
     }
 
 );
-const char* flagment_shader = GLSL(
+constexpr char flagment_shader[] = GLSL(
 
     in mediump vec3 pos; out mediump vec4 color;
 
@@ -95,6 +91,13 @@ const char* flagment_shader = GLSL(
 
 );
 
+GLuint program_id;
+GLuint vert_buffer, elem_buffer;
+
+constexpr size_t vert_len = 4;
+constexpr size_t elem_len = 3;
+} // namespace
+
 struct Pos {
   GLfloat x, y, z;
 };
@@ -103,14 +106,6 @@ struct Edge {
   // contain index
   GLuint begin, end;
 };
-
-namespace {
-GLuint program_id;
-GLuint vert_buffer, elem_buffer;
-
-constexpr size_t vert_len = 4;
-constexpr size_t elem_len = 3;
-} // namespace
 
 extern "C" {
 void init() {
@@ -160,13 +155,13 @@ void init() {
   }
 }
 
-uint64_t i;
-int      draw(float x0, float y0, float z0, float w0, //
-              float x1, float y1, float z1, float w1, //
-              float x2, float y2, float z2, float w2, //
-              float x3, float y3, float z3, float w3  //
-     ) {
-  float mvp_mat[] = {
+int draw(float x0, float y0, float z0, float w0, //
+         float x1, float y1, float z1, float w1, //
+         float x2, float y2, float z2, float w2, //
+         float x3, float y3, float z3, float w3  //
+) {
+  static uint64_t i;
+  float           mvp_mat[] = {
       x0, y0, z0, w0, x1, y1, z1, w1, x2, y2, z2, w2, x3, y3, z3, w3};
 
   // glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
