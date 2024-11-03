@@ -1,6 +1,5 @@
 #include "shader.hpp"
 
-namespace {
 int compile(GLuint program_id, int type, const char* src) {
   GLuint shader_id = glCreateShader(type);
 
@@ -28,7 +27,6 @@ int compile(GLuint program_id, int type, const char* src) {
   glDeleteShader(shader_id);
   return program_id;
 }
-} // namespace
 
 GLuint compile_shader(const char* vertex_src, const char* flagment_src) {
   GLuint program_id   = glCreateProgram();
