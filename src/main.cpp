@@ -67,33 +67,29 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
     Pos* pos =
         (Pos*)glMapBufferRange(GL_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
-    pos[0].x = 0.5f;
-    pos[0].y = 0.5f;
-    pos[1].x = 0.5f;
-    pos[1].y = -0.5f;
-    pos[2].x = -0.5f;
-    pos[2].y = -0.5f;
-    pos[3].x = -0.5f;
-    pos[3].y = 0.5f;
+    pos[0].x = 1.f;
+    pos[0].y = 1.f;
+    pos[1].x = 1.f;
+    pos[1].y = -1.f;
+    pos[2].x = -1.f;
+    pos[2].y = -1.f;
+    pos[3].x = -1.f;
+    pos[3].y = 1.f;
     // needless?
     glUnmapBuffer(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
   {
-    GLsizeiptr size = sizeof(Edge) * 4;
+    GLsizeiptr size = sizeof(GLuint) * 4;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
-    Edge* edge = (Edge*)glMapBufferRange(
+    GLuint* edge = (GLuint*)glMapBufferRange(
         GL_ELEMENT_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
-    edge[0].begin = 0;
-    edge[0].end   = 1;
-    edge[1].begin = 1;
-    edge[1].end   = 2;
-    edge[2].begin = 2;
-    edge[2].end   = 3;
-    edge[3].begin = 3;
-    edge[3].end   = 0;
+    edge[0] = 0;
+    edge[1] = 1;
+    edge[2] = 2;
+    edge[3] = 3;
     glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
@@ -109,7 +105,7 @@ int main() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
-    glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLE_FAN, 8, GL_UNSIGNED_INT, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
