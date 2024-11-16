@@ -15,9 +15,12 @@ std::optional<GLuint> compile(GLuint program_id, int type, const char* src) {
     int log_length = 0;
     glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &log_length);
 
-    char log_message[log_length];
-    glGetShaderInfoLog(shader_id, log_length, NULL, log_message);
-    std::cout << "[Shader error]" << std::endl << log_message << std::endl;
+    char* log_message = (char*)malloc(log_length);
+    if (log_message) {
+      glGetShaderInfoLog(shader_id, log_length, NULL, log_message);
+      std::cout << "[Shader error]" << std::endl << log_message << std::endl;
+      free(log_message);
+    }
 
     glDeleteShader(shader_id);
     glDeleteProgram(program_id);

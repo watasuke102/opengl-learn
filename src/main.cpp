@@ -70,14 +70,15 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STATIC_DRAW);
     Pos* pos =
         (Pos*)glMapBufferRange(GL_ARRAY_BUFFER, 0, size, GL_MAP_WRITE_BIT);
-    pos[0].x = 0.5f;
-    pos[0].y = 0.5f;
-    pos[1].x = 0.5f;
-    pos[1].y = -0.5f;
-    pos[2].x = -0.5f;
-    pos[2].y = -0.5f;
-    pos[3].x = -0.5f;
-    pos[3].y = 0.5f;
+    float rect_size = 0.5f;
+    pos[0].x        = rect_size;
+    pos[0].y        = rect_size;
+    pos[1].x        = rect_size;
+    pos[1].y        = -rect_size;
+    pos[2].x        = -rect_size;
+    pos[2].y        = -rect_size;
+    pos[3].x        = -rect_size;
+    pos[3].y        = rect_size;
     // needless?
     glUnmapBuffer(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -154,9 +155,11 @@ int main() {
   glFramebufferRenderbuffer(
       GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
   E;
-  // GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-  // glDrawBuffers(1, draw_buffers);
-  // E;
+  GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+  glDrawBuffers(1, draw_buffers);
+  E;
+  glReadBuffer(GL_COLOR_ATTACHMENT0);
+  E;
   auto bufstat = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   E;
   if (bufstat != GL_FRAMEBUFFER_COMPLETE) {
@@ -187,8 +190,9 @@ int main() {
 
     // glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, frame_buffer);
+    E;
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    E;
     glBlitFramebuffer(0,
                       0,
                       WIDTH,
@@ -199,26 +203,31 @@ int main() {
                       HEIGHT,
                       GL_COLOR_BUFFER_BIT,
                       GL_NEAREST);
+    E;
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    E;
 
     glFlush();
+    E;
 
-    // FILE* f = fopen("texure.txt", "w+");
-    // for (uint32_t y = 0; y < HEIGHT; ++y) {
-    //   for (uint32_t x = 0; x < WIDTH; ++x) {
-    //     std::fprintf(f,
-    //                  "(%02x, %02x, %02x, %02x)",
-    //                  pixels[WIDTH * y + x * 4 + 0],
-    //                  pixels[WIDTH * y + x * 4 + 1],
-    //                  pixels[WIDTH * y + x * 4 + 2],
-    //                  pixels[WIDTH * y + x * 4 + 3]);
-    //   }
-    //   std::fprintf(f, "\n");
-    // }
-    // fclose(f);
-    // break;
+    {
+      FILE* f = fopen("texure.txt", "w+");
+      for (uint32_t y = 0; y < HEIGHT; ++y) {
+        for (uint32_t x = 0; x < WIDTH; ++x) {
+          std::fprintf(f,
+                       "%02x%02x%02x,",
+                       pixels[(WIDTH * y + x) * 4 + 0],
+                       pixels[(WIDTH * y + x) * 4 + 1],
+                       pixels[(WIDTH * y + x) * 4 + 2]);
+        }
+        std::fprintf(f, "\n");
+      }
+      fclose(f);
+    }
+    break;
 
     glfwSwapBuffers(window);
     glfwPollEvents();
