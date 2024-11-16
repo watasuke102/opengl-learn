@@ -155,11 +155,6 @@ int main() {
   glFramebufferRenderbuffer(
       GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buffer);
   E;
-  GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-  glDrawBuffers(1, draw_buffers);
-  E;
-  glReadBuffer(GL_COLOR_ATTACHMENT0);
-  E;
   auto bufstat = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   E;
   if (bufstat != GL_FRAMEBUFFER_COMPLETE) {
@@ -168,74 +163,71 @@ int main() {
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+  glViewport(0, 0, WIDTH, HEIGHT);
+  // glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
+  glClearColor(0.5f, 0.5f, 0.5f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glUseProgram(program_id);
+
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
+  glDrawElements(GL_TRIANGLE_FAN, 8, GL_UNSIGNED_INT, 0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glDisableVertexAttribArray(0);
+
   std::vector<GLubyte> pixels(WIDTH * HEIGHT * 4);
-  while (!glfwWindowShouldClose(window)) {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
-    glViewport(0, 0, WIDTH, HEIGHT);
-    // glClearColor(0.17f, 0.17f, 0.17f, 1.0f);
-    glClearColor(0.5f, 0.5f, 0.5f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glUseProgram(program_id);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, frame_buffer);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+  glFlush();
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_buffer);
-    glDrawElements(GL_TRIANGLE_FAN, 8, GL_UNSIGNED_INT, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glDisableVertexAttribArray(0);
-
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, frame_buffer);
-    E;
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    E;
-    glBlitFramebuffer(0,
-                      0,
-                      WIDTH,
-                      HEIGHT,
-                      0,
-                      0,
-                      WIDTH,
-                      HEIGHT,
-                      GL_COLOR_BUFFER_BIT,
-                      GL_NEAREST);
-    E;
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glReadPixels(0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
-    E;
-
-    glFlush();
-    E;
-
-    {
-      FILE* f = fopen("texure.txt", "w+");
-      for (uint32_t y = 0; y < HEIGHT; ++y) {
-        for (uint32_t x = 0; x < WIDTH; ++x) {
-          std::fprintf(f,
-                       "%02x%02x%02x,",
-                       pixels[(WIDTH * y + x) * 4 + 0],
-                       pixels[(WIDTH * y + x) * 4 + 1],
-                       pixels[(WIDTH * y + x) * 4 + 2]);
-        }
-        std::fprintf(f, "\n");
-      }
-      fclose(f);
+  constexpr uint32_t imagesize = WIDTH * HEIGHT * 3;
+  constexpr uint32_t filesize  = imagesize + /* header size = */ 54;
+  // clang-format off
+  constexpr uint8_t  header[] = {
+    // file header
+    0x42, 0x4d, // magic
+    (filesize & 0x0000'00ff),
+    (filesize & 0x0000'ff00) >> 8,
+    (filesize & 0x00ff'0000) >> 16,
+    (filesize & 0xff00'0000) >> 24,
+    0, 0, 0, 0, // reserved
+    0x36, 0, 0, 0, // offset to pixel data
+    // info header
+    0x28, 0, 0, 0, // header size
+    WIDTH&0x00ff, (WIDTH&0xff00) >> 8, 0, 0,
+    HEIGHT&0x00ff, (HEIGHT&0xff00) >> 8, 0, 0,
+    1, 0, // plane number; must be 1
+    24, 0, // bits per pixel
+    0, 0, 0, 0, // compression = RGB
+    (imagesize & 0x0000'00ff),
+    (imagesize & 0x0000'ff00) >> 8,
+    (imagesize & 0x00ff'0000) >> 16,
+    (imagesize & 0xff00'0000) >> 24,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, // neadless info
+  };
+  // clang-format on
+  FILE* f = fopen("texure.bmp", "w+b");
+  fwrite(header, sizeof(header), 1, f);
+  for (int y = HEIGHT - 1; y >= 0; --y) {
+    for (int x = 0; x < (int)WIDTH; ++x) {
+      std::fwrite(&pixels[(WIDTH * y + x) * 4 + 2], 1, 1, f); // B
+      std::fwrite(&pixels[(WIDTH * y + x) * 4 + 1], 1, 1, f); // G
+      std::fwrite(&pixels[(WIDTH * y + x) * 4 + 0], 1, 1, f); // R
     }
-    break;
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-      glfwSetWindowShouldClose(window, true);
-    }
+    // std::fprintf(f, "\n");
   }
+  fclose(f);
 
   glfwTerminate();
   return 0;
